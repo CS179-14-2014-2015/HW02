@@ -8,7 +8,7 @@ class Paddle(pygame.sprite.Sprite):
 		# Specify surface with dimensions (width x height)
 		self.image = pygame.Surface((20,100))
 		# Load image and set background to alpha
-		self.image = pygame.image.load('paddle.png').convert_alpha()
+		pygame.draw.rect(self.image,(255,255,255),[0,0,20,100])
 		# get rectangle (surface) attributes (x and y) 
 		self.rect = self.image.get_rect()
 		# Specify initial coordinates
