@@ -1,6 +1,4 @@
-HW02 — Pong (deadline: 2014-11-18)
-===
+Pong Clone (Deadline: 11/25/2014)
+	V1.0: Static table
 
-
-Make a pong clone. You can use any technology you want as long as it's not Flash/Director or a ``game maker''.
-
+Reference: Making Games
