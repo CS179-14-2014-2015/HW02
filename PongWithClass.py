@@ -52,8 +52,7 @@ class Ball(pygame.sprite.Sprite):
        	
     def move(self, direction, walls, paddles):
         #self.rect.x += direction*BALL_SPEED
-        self.rect.y += direction*BALL_SPEED
-   
+        self.rect.y += direction*BALL_SPEED   
         block_hit_list = pygame.sprite.spritecollide(self, walls, paddles, False)
         for block in block_hit_list:
             if direction == LEFT:
