@@ -7,9 +7,9 @@ Pygame __must__ be installed to play.
 
 ## Features 
 
-... Custom Rounds
+ Custom Rounds
 
-... Ball Acceleration
+ Ball Acceleration
 
 
 ## Controls
