@@ -1,6 +1,17 @@
-HW02 — Pong (deadline: 2014-11-18)
-===
+# Speed Pong 
+## by Pepero (Hadrian Lim & Jac Lin Yu)
 
 
-Make a pong clone. You can use any technology you want as long as it's not Flash/Director or a "game maker".
+This is a simple Pong clone made with Python 2.7 and the latest Pygame engine.
+Pygame __must__ be installed to play.
 
+## Features 
+
+⋅⋅⋅ Custom Rounds
+⋅⋅⋅ Ball Acceleration
+
+
+## Controls
+
+__Player 1__ - Use Keys W & A
+__Player 2__ - Use Arrow Keys Up & Down\n
