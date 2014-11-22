@@ -11,7 +11,8 @@ SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 400
 
 BALL_DIAMETER = 15
-BALL_SPEED = 10
+speed_x = 5
+speed_y = 5
 
 PADDLE_WIDTH = 10
 PADDLE_HEIGHT = 50
@@ -25,10 +26,9 @@ WALL_WIDTH = 5
 
 NET_WIDTH = 2
 
+#Paddles Directions
 UP = -1
 DOWN = 1
-RIGHT = 1
-LEFT = -1
 
 #-- Classes --
 class Net(pygame.sprite.Sprite):
@@ -49,9 +49,9 @@ class Ball(pygame.sprite.Sprite):
     	self.rect = self.image.get_rect()
     	self.rect.x = SCREEN_WIDTH/2
     	self.rect.y = SCREEN_HEIGHT/2  	
-    	self.dx = 5
-    	self.dy = 5
-       	
+    	self.dx = speed_x #Speed in x direction
+    	self.dy = speed_y #Speed in y direction
+  	
     def move(self): 
         self.rect.centerx += self.dx
         self.rect.centery += self.dy
@@ -59,13 +59,15 @@ class Ball(pygame.sprite.Sprite):
     def checkCollision(self, walls, paddles):
         walls_hit = pygame.sprite.spritecollide(self, walls, False)
         for wall in walls_hit:
-            if self.rect.bottom == SCREEN_HEIGHT:
+            print self.rect.bottom
+            if self.rect.bottom <= SCREEN_HEIGHT + WALL_WIDTH and self.rect.bottom >= SCREEN_HEIGHT - WALL_WIDTH:
                 self.dy *= -1
             if self.rect.top == 0:
                 self.dy *= -1
         paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
         for paddle in paddles_hit:
-            if self.rect.right == SCREEN_WIDTH-PADDLE_WIDTH:
+            print self.rect.right
+            if self.rect.right <= SCREEN_WIDTH + PADDLE_WIDTH and self.rect.right >= SCREEN_WIDTH - PADDLE_WIDTH:
                 self.dx *= -1
             if self.rect.left == PADDLE_WIDTH:
                 self.dx *= -1
@@ -138,29 +140,27 @@ while not endGame:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             endGame = True
-        #if event.type == KEYDOWN:
-        #    if event.key == K_SPACE:
-        #        ball.move(LEFT, 0, walls_list, paddles_list)
-                                    
+    #-- Player Controls [Right Paddle: Arrow Up and Arrow Down Keys] --                                       
     keys = pygame.key.get_pressed()
     if keys[K_UP]:
         rightPaddle.update(UP, walls_list)
     elif keys[pygame.K_DOWN]:
         rightPaddle.update(DOWN, walls_list)
+    #-- Player Controls [Left Paddle: W for up and S for down] --  
     elif keys[pygame.K_w]:
         leftPaddle.update(UP, walls_list)
     elif keys[pygame.K_s]:
         leftPaddle.update(DOWN, walls_list) 
-    #elif keys[pygame.K_SPACE]:
-    #    ball.move(LEFT, 0, walls_list, paddles_list)
     else:
         print "Unidentified Key"
 
     #-- Set screen color --
     screen.fill(BLACK)
     
+    #-- Ball movement and Collision detection --
     ball.move()
     ball.checkCollision(walls_list, paddles_list)
+    
     #-- Display all sprites --
     all_sprites_list.draw(screen)
 
