@@ -50,15 +50,22 @@ class Ball(pygame.sprite.Sprite):
     	self.rect.x = SCREEN_WIDTH/2
     	self.rect.y = SCREEN_HEIGHT/2
        	
-    def move(self, direction, walls, paddles):
-        #self.rect.x += direction*BALL_SPEED
-        self.rect.y += direction*BALL_SPEED   
-        block_hit_list = pygame.sprite.spritecollide(self, walls, paddles, False)
-        for block in block_hit_list:
-            if direction == LEFT:
-                self.rect.bottom = block.rect.top
+    def move(self, x_dir, y_dir, walls, paddles):
+        
+        self.rect.x += x_dir*BALL_SPEED
+        self.rect.y += y_dir*BALL_SPEED   
+        walls_hit = pygame.sprite.spritecollide(self, walls, False)
+        for wall in walls_hit:
+            if y_dir == DOWN:
+                self.rect.bottom = wall.rect.top
             else:
-                self.rect.top = block.rect.bottom
+                self.rect.top = wall.rect.bottom
+        paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
+        for paddle in paddles_hit:
+            if x_dir == RIGHT:
+                self.rect.right = paddle.rect.left
+            else:
+                self.rect.left = paddle.rect.right
 
 class Paddle(pygame.sprite.Sprite):
     def __init__(self, color, width, height, x, y):
@@ -69,11 +76,11 @@ class Paddle(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
     
-    def update(self, direction, walls):
-        self.rect.y += direction*PADDLE_DISPLACEMENT    
+    def update(self, y_dir, walls):
+        self.rect.y += y_dir*PADDLE_DISPLACEMENT    
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
-            if direction == RIGHT:
+            if y_dir == DOWN:
                 self.rect.bottom = block.rect.top
             else:
                 self.rect.top = block.rect.bottom
@@ -141,7 +148,7 @@ while not endGame:
     elif keys[pygame.K_s]:
         leftPaddle.update(DOWN, walls_list) 
     elif keys[pygame.K_SPACE]:
-        ball.move(RIGHT, walls_list, paddles_list)
+        ball.move(RIGHT, 0, walls_list, paddles_list)
     else:
         print "Unidentified Key"
          
