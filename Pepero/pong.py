@@ -59,11 +59,15 @@ class Ball(pygame.sprite.Sprite):
 		self.speed = speed
 
 	# returns ints for scoreboard identification
-	def checkCollisionBall(self, sprite2):
+	def checkCollisionBall(self, sprite2, Speedy = True):
+		addSpeed = 0
+		if Speedy is True:
+			addSpeed = 1
 	 	result = pygame.sprite.collide_rect(self, sprite2)
 	 	if result == True:
 	 		if type(sprite2) == Paddle:
 	 			self.horizontal *= -1
+	 			self.speed += addSpeed
 	 			return 0
 	 		elif ((sprite2 == topWall) or (sprite2 == bottomWall)):
 	 			self.vertical *= -1
@@ -156,9 +160,17 @@ if __name__ == "__main__":
 	print "2-Player Speed Pong by Hadrian Lim and Jac Lin Yu\n\n"
 	print "Player 1 - Use Keys W & A"
 	print "Player 2 - Use Arrow Keys Up & Down\n"
-	rounds = input("How many rounds do you want to play? (First to reach..): ")
-	Speed = raw_input("Do you want progressive ball speed per round? [y/n]")
-	anyKey = raw_input('Press any key to play. Have Fun!')	
+	rounds = input("How many rounds do you want to play? (Best out of..): ")
+	Speed = raw_input("Do you want progressive ball speed per round? [Y/N]: ")
+	anyKey = raw_input('Press enter to play. Have Fun!')	
+
+	if Speed.upper() == 'Y':
+		Speedy = True
+	else:
+		Speedy = False
+
+	if rounds % 2 == 0:
+		rounds += 1
 	
 	# initialize pygame
 	pygame.init()
@@ -233,21 +245,17 @@ if __name__ == "__main__":
 			player2.checkCollisionPaddle(Walls[x])
 		
 		for graphics in collideList:
-			hasScored = ball1.checkCollisionBall(graphics)
+			hasScored = ball1.checkCollisionBall(graphics, Speedy)
 			if hasScored == 1:
 				player2Score.add()
-				if Speed == 'y':
-					ball1.speed += 1
 			elif hasScored == -1:
 				player1Score.add()
-				if Speed == 'y':
-					ball1.speed += 1
-
+			
 
 
 		ball1.move()
 
-		if player1Score.score == rounds or player2Score.score == rounds :
+		if player1Score.score == rounds/2 + 1 or player2Score.score == rounds/2 + 1:
 			if player1Score.score > player2Score.score:
 				declareWinner = Scoreboard(100,150, 'PLAYER 1 WINS')
 			else:
