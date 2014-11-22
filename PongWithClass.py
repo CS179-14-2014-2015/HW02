@@ -38,7 +38,7 @@ class Net(pygame.sprite.Sprite):
         self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = SCREEN_WIDTH/2
-        self.rect.y = 0
+        self.rect.y = WALL_WIDTH
         
 class Ball(pygame.sprite.Sprite):
     def __init__(self, color, diameter):
@@ -48,24 +48,27 @@ class Ball(pygame.sprite.Sprite):
     	pygame.draw.circle(self.image, color, (diameter/2, diameter/2), diameter/2)
     	self.rect = self.image.get_rect()
     	self.rect.x = SCREEN_WIDTH/2
-    	self.rect.y = SCREEN_HEIGHT/2
+    	self.rect.y = SCREEN_HEIGHT/2  	
+    	self.dx = 5
+    	self.dy = 5
        	
-    def move(self, x_dir, y_dir, walls, paddles):
+    def move(self): 
+        self.rect.centerx += self.dx
+        self.rect.centery += self.dy
         
-        self.rect.x += x_dir*BALL_SPEED
-        self.rect.y += y_dir*BALL_SPEED   
+    def checkCollision(self, walls, paddles):
         walls_hit = pygame.sprite.spritecollide(self, walls, False)
         for wall in walls_hit:
-            if y_dir == DOWN:
-                self.rect.bottom = wall.rect.top
-            else:
-                self.rect.top = wall.rect.bottom
+            if self.rect.bottom == SCREEN_HEIGHT:
+                self.dy *= -1
+            if self.rect.top == 0:
+                self.dy *= -1
         paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
         for paddle in paddles_hit:
-            if x_dir == RIGHT:
-                self.rect.right = paddle.rect.left
-            else:
-                self.rect.left = paddle.rect.right
+            if self.rect.right == SCREEN_WIDTH-PADDLE_WIDTH:
+                self.dx *= -1
+            if self.rect.left == PADDLE_WIDTH:
+                self.dx *= -1
 
 class Paddle(pygame.sprite.Sprite):
     def __init__(self, color, width, height, x, y):
@@ -93,7 +96,6 @@ class Wall(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
-
 
 #-- Pygame Initializing --
 pygame.init()
@@ -127,16 +129,18 @@ all_sprites_list.add(topWall, bottomWall)
 
 #-- Variable to end the game --
 endGame = False
+
+#-- Pygame Clock --
 clock = pygame.time.Clock()
 
+#-- Game loop --
 while not endGame:
-    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             endGame = True
         #if event.type == KEYDOWN:
         #    if event.key == K_SPACE:
-        #        ball.move(RIGHT, walls_list, paddles_list) 
+        #        ball.move(LEFT, 0, walls_list, paddles_list)
                                     
     keys = pygame.key.get_pressed()
     if keys[K_UP]:
@@ -147,20 +151,22 @@ while not endGame:
         leftPaddle.update(UP, walls_list)
     elif keys[pygame.K_s]:
         leftPaddle.update(DOWN, walls_list) 
-    elif keys[pygame.K_SPACE]:
-        ball.move(RIGHT, 0, walls_list, paddles_list)
+    #elif keys[pygame.K_SPACE]:
+    #    ball.move(LEFT, 0, walls_list, paddles_list)
     else:
         print "Unidentified Key"
-         
+
     #-- Set screen color --
     screen.fill(BLACK)
-
+    
+    ball.move()
+    ball.checkCollision(walls_list, paddles_list)
     #-- Display all sprites --
     all_sprites_list.draw(screen)
 
     #-- Update the screen --
     pygame.display.flip()
-    clock.tick(100)
+    clock.tick(60)
         
 pygame.quit()
 sys.exit()
