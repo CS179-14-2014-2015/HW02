@@ -1,22 +1,16 @@
 import pygame
 from pygame.locals import *
 from random import choice
+import sys
 
-class Scoreboard(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		self.score = 0
-		pygame.sprite.Sprite.__init__(self)
-		self.font = pygame.font.Font('scoreboard.ttf', 50)
-		self.image = self.font.render(("%r" %self.score), False, (0, 128, 128))
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
+"""
+	A Pong Clone by Pepero
+Hadrian Lim and Jac Lin Yu
+		CS179.14 2014-2015
+"""
 
-	def add(self):
-		self.score += 1
 
-	def getscore(self):
-		score
+""" Game Classes """
 
 class Paddle(pygame.sprite.Sprite):
 	def __init__(self, x, y):
@@ -33,22 +27,21 @@ class Paddle(pygame.sprite.Sprite):
 		self.rect.y = y
 
 	def moveUp(self):
-		self.rect.y -= 5
+		self.rect.y -= 10
 
 	def moveDown(self):
-		self.rect.y += 5
+		self.rect.y += 10
 
 	def checkCollisionPaddle(self, sprite2):
 	 	result = pygame.sprite.collide_rect(self, sprite2)
 	 	if result == True:
 	 		if sprite2 == topWall:
-	 			self.rect.y = 320
-	 		elif sprite2 == bottomWall:
 	 			self.rect.y = 0
+	 		elif sprite2 == bottomWall:
+	 			self.rect.y = 320
 
-# Ball class
 class Ball(pygame.sprite.Sprite):
-	def __init__(self, x, y, speed = 3):
+	def __init__(self, x, y, speed = 2):
     #inherit constructor from Sprite class
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.Surface((10, 10))
@@ -59,36 +52,35 @@ class Ball(pygame.sprite.Sprite):
 		# Specify reset position
 		self.xinit = x
 		self.yinit = y
-		#random starting directions
+		#random starting directions -1 for left, down; 1 for right, up
 		self.horizontal = choice([1, -1])
 		self.vertical = choice([1, -1])
 		#starting speed
 		self.speed = speed
 
+	# returns ints for scoreboard identification
 	def checkCollisionBall(self, sprite2):
 	 	result = pygame.sprite.collide_rect(self, sprite2)
 	 	if result == True:
 	 		if type(sprite2) == Paddle:
 	 			self.horizontal *= -1
+	 			return 0
 	 		elif ((sprite2 == topWall) or (sprite2 == bottomWall)):
 	 			self.vertical *= -1
+	 			return 0
 	 		elif sprite2 == leftWall:
 	 			self.resetPosition()
+	 			return 1
 			elif sprite2  == rightWall:
 				self.resetPosition()
+				return -1
+			return 0
 
 	def resetPosition(self):
 		self.rect.x = self.xinit
 		self.rect.y = self.yinit
 		self.horizontal = choice([1, -1])
 		self.vertical = choice([1, -1])
-
-	def changeDirection(self):
-		if self.checkCollision.result == True:
-		 	if type(sprite2) == Paddle :
-		 		horizontal *= -1
-		 	elif type(sprite2) == Wall:
-		 		vertical *= -1
 			
 	def move(self):
 		if self.horizontal == 1:
@@ -106,7 +98,10 @@ class Ball(pygame.sprite.Sprite):
 				self.rect.x -= self.speed
 				self.rect.y += self.speed
 
-# Wall Class
+	def stop(self):
+		self.speed = 0
+
+
 class Wall(pygame.sprite.Sprite):
 	def __init__(self, width, height, x, y):
 		pygame.sprite.Sprite.__init__(self) 
@@ -120,81 +115,151 @@ class Wall(pygame.sprite.Sprite):
 		self.rect.y = y
 
 
-# initialize pygame
-pygame.init()
+class Scoreboard(pygame.sprite.Sprite):
+	def __init__(self, x, y, score = 0):
+		self.score = score
+		pygame.sprite.Sprite.__init__(self)
+		self.font = pygame.font.Font('scoreboard.ttf', 50)
+		self.image = self.font.render(("%r" %self.score), False, (0, 128, 128))
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
 
-# set screen dimensions
-screen_width = 600
-screen_height = 400
-screen = pygame.display.set_mode([screen_width, screen_height])
+	def add(self):
+		self.score += 1
+		self.image = self.font.render(("%r" %self.score), False, (0, 128, 128))
 
-# Used to manage how fast the screen updates
-clock = pygame.time.Clock()
 
-# This is the sprite list. All you need to know is that this list is used for rendering/updating ALL the graphics/images it has :)
-spritesList = pygame.sprite.RenderPlain()
+class DashedLine(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.Surface((2, 400))
+		pygame.draw.line(self.image, (255, 255, 255), (0,25), (0,40), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,65), (0,80), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,105), (0,120), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,145), (0,160), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,185), (0,200), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,225), (0,240), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,265), (0,280), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,305), (0,320), 2)
+		pygame.draw.line(self.image, (255, 255, 255), (0,345), (0,360), 2)
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
 
-#Declare Walls
-topWall = Wall(500, 2, 50, 0)
-bottomWall = Wall(500, 2, 50, 398)
-leftWall = Wall(2, 500, 50, 0)
-rightWall = Wall(2, 500, 548, 0)
+""" Game Runtime """
 
-#Declare player 1 Paddle with starting X,Y coordinates
-player1 = Paddle(48, 163)
 
-#Declare player 2 Paddle with starting X,Y coordinates
-player2 = Paddle(546, 163)
+if __name__ == "__main__":
 
-#Declare ball
-ball1 = Ball(295, 195)
-
-player1Score = Scoreboard(13, 180)
-player2Score = Scoreboard(562, 180)
-
-# Add player 1 to spritesList
-# Every graphical object should be added to spritesList
-spritesList.add(player1, player2, ball1, player1Score, player2Score, topWall, bottomWall, leftWall, rightWall)
-
-while 1:
-	ball1.move()
-	#newBall.rect.move_ip(horizontal,vertical)
-	pressed = pygame.key.get_pressed()
-	if pressed[pygame.K_w]:
-		player1.moveUp()
-	if pressed[pygame.K_s]:
-		player1.moveDown()
-	if pressed[pygame.K_UP]:
-		player2.moveUp()
-	if pressed[pygame.K_DOWN]:
-		player2.moveDown()
-
-	for event in pygame.event.get(): #User did something
-		if event.type == pygame.QUIT: #If user clicked close
-			pygame.quit() #Exit Flag
-
-	#Black BG
-	screen.fill(0)
+	# Start Menu
+	print "2-Player Speed Pong by Hadrian Lim and Jac Lin Yu\n\n"
+	print "Player 1 - Use Keys W & A"
+	print "Player 2 - Use Arrow Keys Up & Down\n"
+	rounds = input("How many rounds do you want to play? (First to reach..): ")
+	Speed = raw_input("Do you want progressive ball speed per round? [y/n]")
+	anyKey = raw_input('Press any key to play. Have Fun!')	
 	
-	#Draws or "Blits" all the graphics in spritesList
-	spritesList.draw(screen)
+	# initialize pygame
+	pygame.init()
 
-	player1.checkCollisionPaddle(topWall)
-	player1.checkCollisionPaddle(bottomWall)
-	player2.checkCollisionPaddle(topWall)
-	player2.checkCollisionPaddle(bottomWall)
+	# set screen dimensions and title
+	screen_width, screen_height = 600, 400
+	screen = pygame.display.set_mode((screen_width, screen_height))
+	pygame.display.set_caption("Speed Pong")
+	# Used to manage how fast the screen updates
+	clock = pygame.time.Clock()
+
+	# This is the sprite container class. All you need to know is that this class is used for rendering/updating ALL the graphics/images it has :)
+	spritesContainer = pygame.sprite.RenderPlain()
+
+	#Declare Walls
+	topWall = Wall(500, 2, 50, 0)
+	bottomWall = Wall(500, 2, 50, 398)
+	leftWall = Wall(2, 500, 50, 0)
+	rightWall = Wall(2, 500, 548, 0)
+
+	# Declare Walls list to contain all walls
+	Walls = [topWall, bottomWall, leftWall, rightWall]
+
+	#Declare player 1 and 2 Paddles with starting X,Y coordinates
+	player1, player2 = Paddle(52, 163), Paddle(546, 163)
+	 
+	#Declare ball
+	ball1 = Ball(295, 195)
+
+	#Declare Scoreboards with starting coordinates
+	player1Score, player2Score = Scoreboard(13, 180), Scoreboard(562, 180)
 	
-	ball1.checkCollisionBall(player1)
-	ball1.checkCollisionBall(player2)
-	ball1.checkCollisionBall(topWall)
-	ball1.checkCollisionBall(bottomWall)
-	ball1.checkCollisionBall(leftWall)
-	ball1.checkCollisionBall(rightWall)
 
-	#FPS
-	clock.tick(40)
+	#Declare Middle Line
+	middleLine = DashedLine(300, 0)
 
-	#update the screen
-	pygame.display.flip()
+	# Declare collide list to contain all collide-able elements
+	collideList = [player1, player2, ball1] + Walls
+
+	# Add player 1 to spritesContainer
+	# Every graphical object should be added to spritesContainer
+	spritesContainer.add(player1, player2, ball1, player1Score, player2Score, topWall, bottomWall, leftWall, rightWall, middleLine)
+
+
+	# Run game loop
+	while 1:
+		
+		# Input Detection
+		pressed = pygame.key.get_pressed()
+		if pressed[pygame.K_w]:
+			player1.moveUp()
+		if pressed[pygame.K_s]:
+			player1.moveDown()
+		if pressed[pygame.K_UP]:
+			player2.moveUp()
+		if pressed[pygame.K_DOWN]:
+			player2.moveDown()
+
+		for event in pygame.event.get(): #User did something
+			if event.type == pygame.QUIT: #If user clicked close
+				pygame.quit()
+				sys.exit() #Exit Flag
+
+		#Black BG
+		screen.fill(0)
+		
+		#Draws all the graphics in spritesContainer
+		spritesContainer.draw(screen)
+
+		for x in range(0,2):
+			player1.checkCollisionPaddle(Walls[x])
+			player2.checkCollisionPaddle(Walls[x])
+		
+		for graphics in collideList:
+			hasScored = ball1.checkCollisionBall(graphics)
+			if hasScored == 1:
+				player2Score.add()
+				if Speed == 'y':
+					ball1.speed += 1
+			elif hasScored == -1:
+				player1Score.add()
+				if Speed == 'y':
+					ball1.speed += 1
+
+
+
+		ball1.move()
+
+		if player1Score.score == rounds or player2Score.score == rounds :
+			if player1Score.score > player2Score.score:
+				declareWinner = Scoreboard(100,150, 'PLAYER 1 WINS')
+			else:
+				declareWinner = Scoreboard(100,150, 'PLAYER 2 WINS')	
+			spritesContainer.add(declareWinner)
+			spritesContainer.remove(ball1, middleLine)
+			ball1.stop()
+		
+		#FPS
+		clock.tick(45)
+
+		#update  or "Blits" the screen
+		pygame.display.flip()
 
 
