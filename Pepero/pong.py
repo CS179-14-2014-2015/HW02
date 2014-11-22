@@ -161,7 +161,7 @@ if __name__ == "__main__":
 	print "Player 1 - Use Keys W & A"
 	print "Player 2 - Use Arrow Keys Up & Down\n"
 	rounds = input("How many rounds do you want to play? (Best out of..): ")
-	Speed = raw_input("Do you want progressive ball speed per round? [Y/N]: ")
+	Speed = raw_input("Do you want progressive ball speed per paddle hit? [Y/N]: ")
 	anyKey = raw_input('Press enter to play. Have Fun!')	
 
 	if Speed.upper() == 'Y':
@@ -248,9 +248,10 @@ if __name__ == "__main__":
 			hasScored = ball1.checkCollisionBall(graphics, Speedy)
 			if hasScored == 1:
 				player2Score.add()
+				ball1.speed = 2
 			elif hasScored == -1:
 				player1Score.add()
-			
+				ball1.speed = 2
 
 
 		ball1.move()
