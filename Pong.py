@@ -8,7 +8,7 @@ WHITE = (229,252,194)
 BLUE = (84,121,128)
 GREEN = (237,201,81)
 RED = (204,51,63)
-SCORE_BOARD_COLOR = (157,224,173)
+SCORE_BOARD_COLOR = (157,224,173, 90)
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 400
@@ -118,12 +118,13 @@ class Score(pygame.sprite.Sprite):
         self.image.fill(FEIND)
         self.rect = self.image.get_rect()
         self.rect.centerx = x_pos
-        self.rect.centery = SCREEN_HEIGHT/8
+        self.rect.centery = SCREEN_HEIGHT/4
         self.score = 0
+        self.font = pygame.font.Font("chargen.ttf", 250)
+        self.image = self.font.render(("%r" %self.score), False, SCORE_BOARD_COLOR)
         
     def addScore(self):
         self.score += 1
-        self.font = pygame.font.SysFont("../Fonts/chargen.ttf", 50)
         self.image = self.font.render(("%r" %self.score), False, SCORE_BOARD_COLOR)
         
         
