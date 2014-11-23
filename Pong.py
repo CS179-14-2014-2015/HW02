@@ -115,15 +115,17 @@ class Score(pygame.sprite.Sprite):
     def __init__(self, x_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([SCORE_BOARD_WIDTH, SCORE_BOARD_HEIGHT])
-        self.image.fill(SCORE_BOARD_COLOR)
+        self.image.fill(FEIND)
         self.rect = self.image.get_rect()
         self.rect.centerx = x_pos
         self.rect.centery = SCREEN_HEIGHT/8
         self.score = 0
-
+        
     def addScore(self):
         self.score += 1
-        self.image = self.font.render("HELLO", True, (0,0,0))
+        self.font = pygame.font.SysFont("../Fonts/chargen.ttf", 50)
+        self.image = self.font.render(("%r" %self.score), False, SCORE_BOARD_COLOR)
+        
         
 #-- Pygame Initializing --
 pygame.init()
@@ -188,12 +190,12 @@ while not endGame:
     keys = pygame.key.get_pressed()
     if keys[K_UP]:
         rightPaddle.move(UP, walls_list)
-    elif keys[pygame.K_DOWN]:
+    if keys[pygame.K_DOWN]:
         rightPaddle.move(DOWN, walls_list)
     #-- Player Controls [Left Paddle: W for up and S for down] --  
-    elif keys[pygame.K_w]:
+    if keys[pygame.K_w]:
         leftPaddle.move(UP, walls_list)
-    elif keys[pygame.K_s]:
+    if keys[pygame.K_s]:
         leftPaddle.move(DOWN, walls_list) 
 
     #-- Set screen color --
