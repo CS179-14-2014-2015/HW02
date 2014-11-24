@@ -12,6 +12,7 @@ sounds = {
 sounds["ping"].set_volume(0.05)
 sounds["click"].set_volume(0.5)
 sounds["da-ding"].set_volume(0.5)
+
 #-- Global Constants --
 FEIND = (89,79,79)
 LIGHTBLUE = (69,173,168)
@@ -87,11 +88,10 @@ class Ball(pygame.sprite.Sprite):
         for wall in walls_hit:
             #makes the walls impassable
             if self.rect.bottom <= SCREEN_HEIGHT + WALL_WIDTH and self.rect.bottom >= SCREEN_HEIGHT - WALL_WIDTH:
-                self.dy *= -1
-                sounds["ping"].play()
+                self.dy *= -1               
             if self.rect.top <= WALL_WIDTH and self.rect.top >= -1 * WALL_WIDTH:
                 self.dy *= -1
-                sounds["ping"].play()   
+
         #gets the instances the ball hits the right and left paddles
         paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
         for paddle in paddles_hit:
@@ -100,6 +100,7 @@ class Ball(pygame.sprite.Sprite):
                 self.dx *= -1
             if self.rect.left <= 2 * PADDLE_WIDTH and self.rect.left >= -1 * PADDLE_WIDTH:
                 self.dx *= -1  
+            sounds["ping"].play()
         #calls addscore when the ball passes the left and right sides
         if self.rect.right >= SCREEN_WIDTH or self.rect.left <= 0:
             if self.rect.right >= SCREEN_WIDTH:
