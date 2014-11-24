@@ -24,6 +24,8 @@ L_PADDLE_YPOS = SCREEN_HEIGHT/2
 R_PADDLE_XPOS = SCREEN_WIDTH - 2*L_PADDLE_XPOS
 R_PADDLE_YPOS = SCREEN_HEIGHT/2
 PADDLE_DISPLACEMENT = 5
+playerOneName = "Je"
+playerTwoName = "Ivan"
 
 WALL_WIDTH = 5
 SCORE_WALL_WIDTH = 1
@@ -54,7 +56,7 @@ class Ball(pygame.sprite.Sprite):
     	self.image.fill(FEIND)
     	pygame.draw.circle(self.image, color, (diameter/2, diameter/2), diameter/2)
     	self.rect = self.image.get_rect()
-    	self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3)
+    	self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_WIDTH/3)
     	self.rect.y = random.randint(SCREEN_HEIGHT/3, 2*SCREEN_HEIGHT/3) 	
     	self.dx = speed_x #Speed in x direction
     	self.dy = speed_y #Speed in y direction
@@ -78,10 +80,10 @@ class Ball(pygame.sprite.Sprite):
                 self.dx *= -1    
         if self.rect.right >= SCREEN_WIDTH or self.rect.left <= 0:
             if self.rect.right >= SCREEN_WIDTH:
-                playerOne.addScore()
+                playerOne.addScore(playerOneName)
             if self.rect.left <= 0:
-                playerTwo.addScore()
-            self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_HEIGHT/3)
+                playerTwo.addScore(playerTwoName)
+            self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_WIDTH/3)
             self.rect.y = random.randint(SCREEN_HEIGHT/3, 2*SCREEN_HEIGHT/3) 
 
 class Paddle(pygame.sprite.Sprite):
@@ -112,21 +114,31 @@ class Wall(pygame.sprite.Sprite):
         self.rect.x = x
 
 class Score(pygame.sprite.Sprite):
-    def __init__(self, x_pos):
+    def __init__(self, playerName, x_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([SCORE_BOARD_WIDTH, SCORE_BOARD_HEIGHT])
         self.image.fill(FEIND)
         self.rect = self.image.get_rect()
         self.rect.centerx = x_pos
-        self.rect.centery = SCREEN_HEIGHT/4
+        self.rect.centery = SCREEN_HEIGHT/16
         self.score = 0
-        self.font = pygame.font.Font("chargen.ttf", 250)
-        self.image = self.font.render(("%r" %self.score), False, SCORE_BOARD_COLOR)
+        self.font = pygame.font.Font("chargen.ttf", 25)
+        self.image = self.font.render(("%s: %r" %(playerName, self.score)), False, SCORE_BOARD_COLOR)
         
-    def addScore(self):
+        # self.win = pygame.Surface([100, 100]) 
+        # self.image.fill(RED)
+        # self.rect = self.win.get_rect()
+        # self.rect.centerx = 200
+        # self.rect.centery = 350 
+        # self.image = self.font.render("HI", False, SCORE_BOARD_COLOR)
+
+    def addScore(self, playerName):
         self.score += 1
-        self.image = self.font.render(("%r" %self.score), False, SCORE_BOARD_COLOR)
-        
+        self.image = self.font.render(("%s: %r" %(playerName, self.score)), False, SCORE_BOARD_COLOR)
+        if self.score == 3:
+            self.image = self.font.render(("%s wins :)" %(playerName)), False, SCORE_BOARD_COLOR)
+            ball.dx = 0
+            ball.dy = 0
         
 #-- Pygame Initializing --
 pygame.init()
@@ -149,8 +161,8 @@ net = Net(GREEN, NET_WIDTH)
 all_sprites_list.add(net)
 
 #-- Create a Score board --
-playerOne = Score(SCREEN_WIDTH/4)
-playerTwo = Score(3*SCREEN_WIDTH/4)
+playerOne = Score(playerOneName, SCREEN_WIDTH/4)
+playerTwo = Score(playerTwoName, 3*SCREEN_WIDTH/4)
 all_sprites_list.add(playerOne)
 all_sprites_list.add(playerTwo)
 
@@ -171,10 +183,10 @@ walls_list.add(topWall, bottomWall)
 all_sprites_list.add(topWall, bottomWall)
 
 #-- Create Red Walls --
-leftWall = Wall(RED, L_PADDLE_XPOS, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-2*WALL_WIDTH)
-rightWall = Wall(RED, R_PADDLE_XPOS+PADDLE_WIDTH, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-WALL_WIDTH)
-all_sprites_list.add(leftWall, rightWall)
-score_walls_list.add(leftWall, rightWall)
+# leftWall = Wall(RED, L_PADDLE_XPOS, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-2*WALL_WIDTH)
+# rightWall = Wall(RED, R_PADDLE_XPOS+PADDLE_WIDTH, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-WALL_WIDTH)
+# all_sprites_list.add(leftWall, rightWall)
+# score_walls_list.add(leftWall, rightWall)
 
 #-- Variable to end the game --
 endGame = False
