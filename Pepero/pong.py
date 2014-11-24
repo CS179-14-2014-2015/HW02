@@ -40,6 +40,12 @@ class Paddle(pygame.sprite.Sprite):
 	 		elif sprite2 == bottomWall:
 	 			self.rect.y = 320
 
+	def AI(self, ball):
+		if ball.rect.y < self.rect.y:
+		    self.moveUp()
+		if ball.rect.y > self.rect.y:
+		    self.moveDown()
+
 class Ball(pygame.sprite.Sprite):
 	def __init__(self, x, y, speed = 2):
     #inherit constructor from Sprite class
@@ -61,7 +67,7 @@ class Ball(pygame.sprite.Sprite):
 	# returns ints for scoreboard identification
 	def checkCollisionBall(self, sprite2, Speedy = True):
 		addSpeed = 0
-		if Speedy is True:
+		if Speedy is True and addSpeed < 4:
 			addSpeed = 1
 	 	result = pygame.sprite.collide_rect(self, sprite2)
 	 	if result == True:
@@ -160,6 +166,7 @@ if __name__ == "__main__":
 	print "2-Player Speed Pong by Hadrian Lim and Jac Lin Yu\n\n"
 	print "Player 1 - Use Keys W & A"
 	print "Player 2 - Use Arrow Keys Up & Down\n"
+	AI = raw_input("Are you playing alone? (Player 2 is AI) [Y/N]:")
 	rounds = input("How many rounds do you want to play? (Best out of..): ")
 	Speed = raw_input("Do you want progressive ball speed per paddle hit? [Y/N]: ")
 	anyKey = raw_input('Press enter to play. Have Fun!')	
@@ -169,9 +176,11 @@ if __name__ == "__main__":
 	else:
 		Speedy = False
 
-	if rounds % 2 == 0:
-		rounds += 1
-	
+	if AI.upper() == 'Y':
+		AImode = True
+	else:
+		AImode = False
+
 	# initialize pygame
 	pygame.init()
 
@@ -195,7 +204,7 @@ if __name__ == "__main__":
 	Walls = [topWall, bottomWall, leftWall, rightWall]
 
 	#Declare player 1 and 2 Paddles with starting X,Y coordinates
-	player1, player2 = Paddle(52, 163), Paddle(546, 163)
+	player1, player2 = Paddle(52, 163), Paddle(543, 163)
 	 
 	#Declare ball
 	ball1 = Ball(295, 195)
@@ -255,6 +264,8 @@ if __name__ == "__main__":
 
 
 		ball1.move()
+		if AImode:
+			player2.AI(ball1)
 
 		if player1Score.score == rounds/2 + 1 or player2Score.score == rounds/2 + 1:
 			if player1Score.score > player2Score.score:
