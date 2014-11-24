@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,6 +14,7 @@ namespace Pong
         PictureBox picBoxPlayerOne, picBoxPlayerTwo, picBoxBall;
         Label playerOneScore_label, playerTwoScore_label;
         Timer gameTime;
+        DialogResult gameResult;
 
         const int SCREEN_WIDTH = 800;
         const int SCREEN_HEIGHT = 600;
@@ -29,11 +30,14 @@ namespace Pong
         int playerTwoScore = 0;
 
         private enum Direction { None, Up, Down };
+        private Direction playerOneCurrentDir = Direction.None;
         private Direction currentDir = Direction.None;
+
 
         public gameArea()
         {
             InitializeComponent();
+
             
             KeyDown += new KeyEventHandler(Form_Keydown);
             KeyUp += new KeyEventHandler(playerTwo_Keyup);
@@ -42,7 +46,7 @@ namespace Pong
             picBoxPlayerTwo = new PictureBox();//Initializes the PictureBoxes
             picBoxBall = new PictureBox();//
 
-            playerOneScore_label = new Label();
+            playerOneScore_label = new Label(); //Initializes labels for the scores
             playerTwoScore_label = new Label();
 
             gameTime = new Timer();//Initializes the Timer
@@ -55,6 +59,7 @@ namespace Pong
             this.Width = SCREEN_WIDTH;//sets the Form's Width
             this.Height = SCREEN_HEIGHT;//sets the Form's Height
             this.StartPosition = FormStartPosition.CenterScreen;//opens the form in center of the screen
+
 
             picBoxPlayerOne.Size = sizePlayer;//sets the size of the picturebox
             picBoxPlayerOne.Location = new Point(picBoxPlayerOne.Width / 2, ClientSize.Height / 2 - picBoxPlayerOne.Height / 2);//sets it's location (centered)
@@ -71,18 +76,18 @@ namespace Pong
             picBoxBall.BackColor = Color.Green;
             this.Controls.Add(picBoxBall);
 
-            playerOneScore_label.Text = playerOneScore.ToString();
-            playerOneScore_label.Location = new Point(730, 540 );
-            this.Controls.Add(playerOneScore_label);
-
             playerTwoScore_label.Text = playerTwoScore.ToString();
-            playerTwoScore_label.Location = new Point(40, 540);
+            playerTwoScore_label.Location = new Point(730, 540 );
             this.Controls.Add(playerTwoScore_label);
+
+            playerOneScore_label.Text = playerOneScore.ToString();
+            playerOneScore_label.Location = new Point(40, 540);
+            this.Controls.Add(playerOneScore_label);
         }
 
         void gameTime_Tick(object sender, EventArgs e)
         {
-            picBoxBall.Location = new Point(picBoxBall.Location.X + ballSpeedX, picBoxBall.Location.Y + ballSpeedY); //updates ball's position
+            picBoxBall.Location = new Point(picBoxBall.Location.X + ballSpeedX, picBoxBall.Location.Y + ballSpeedY);
             gameAreaCollisions();//Checks for collisions with the form's border
             padlleCollision();//Checks for collisions with the padlles
             playerMovement();//Updates the player's position
@@ -95,17 +100,43 @@ namespace Pong
             {
                 ballSpeedY = -ballSpeedY;
             }
-            else if (picBoxBall.Location.X > ClientSize.Width) // Scoring for Player 2
+            else if (picBoxBall.Location.X > ClientSize.Width) // Scoring for Player One
             {
-                resetBall();
-                playerTwoScore++;
-                playerTwoScore_label.Text = playerTwoScore.ToString(); 
-            }
-            else if (picBoxBall.Location.X < 0) // Scoring for Player One
-            {
-                resetBall();
                 playerOneScore++;
                 playerOneScore_label.Text = playerOneScore.ToString();
+                if (playerOneScore == 3)
+                {
+                    gameTime.Stop();
+                    gameResult = MessageBox.Show("PLAYER ONE WINS! YEY!", "", MessageBoxButtons.OK);
+                    if (gameResult == DialogResult.OK)
+                    {
+                        gameTime.Start();
+                        resetBall();
+                        playerOneScore = 0;
+                        playerOneScore_label.Text = playerOneScore.ToString();
+                    }
+                }
+                else
+                { resetBall(); }
+            }
+            else if (picBoxBall.Location.X < 0) // Scoring for Player Two
+            {
+                playerTwoScore++;
+                playerTwoScore_label.Text = playerTwoScore.ToString();
+                if(playerTwoScore == 10)
+                {
+                    gameTime.Stop();
+                    gameResult = MessageBox.Show("PLAYER TWO WINS! YEY!", "", MessageBoxButtons.OK);
+                    if (gameResult == DialogResult.OK)
+                    {
+                        gameTime.Start();
+                        resetBall();
+                        playerTwoScore = 0;
+                        playerTwoScore_label.Text = playerTwoScore.ToString();
+                    }
+                }
+                else
+                { resetBall();}
             }
         }
 
@@ -116,12 +147,11 @@ namespace Pong
 
         private void playerMovement() //Function for Player One Movement
         {
-            if (this.PointToClient(MousePosition).Y >= picBoxPlayerOne.Height / 2 && this.PointToClient(MousePosition).Y <= ClientSize.Height - picBoxPlayerOne.Height / 2)
+            int vel = 5;
+            switch (playerOneCurrentDir)
             {
-                int playerX = picBoxPlayerOne.Width / 2;
-                int playerY = this.PointToClient(MousePosition).Y - picBoxPlayerOne.Height / 2;
-
-                picBoxPlayerOne.Location = new Point(playerX, playerY);
+                case Direction.Up: picBoxPlayerOne.Top -= Math.Min(vel, picBoxPlayerOne.Top); break;
+                case Direction.Down: picBoxPlayerOne.Top += Math.Min(vel, this.ClientSize.Height - picBoxPlayerOne.Bottom); break;
             }
         }
 
@@ -156,6 +186,8 @@ namespace Pong
                 case Keys.Up: currentDir = Direction.Up; break; // Press Up arrow key to make the paddle go up
                 case Keys.Down: currentDir = Direction.Down; break; //Press Down arrow key to make the paddle go down
                 case Keys.Escape: this.Close(); break; //Press Esc to exit the program
+                case Keys.A: playerOneCurrentDir = Direction.Up; break; // Press A to make left paddle go up
+                case Keys.S: playerOneCurrentDir = Direction.Down; break; //Press S to make left paddle go down
             }
                 
         }
@@ -166,6 +198,8 @@ namespace Pong
             {
                 case Keys.Up: if (currentDir == Direction.Up) currentDir = Direction.None; break;
                 case Keys.Down: if (currentDir == Direction.Down) currentDir = Direction.None; break;
+                case Keys.A: if (playerOneCurrentDir == Direction.Up) playerOneCurrentDir = Direction.None; break;
+                case Keys.S: if (playerOneCurrentDir == Direction.Down) playerOneCurrentDir = Direction.None; break;
             }
         }
     }
