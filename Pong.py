@@ -32,6 +32,7 @@ SCORE_WALL_WIDTH = 1
 
 SCORE_BOARD_WIDTH = 100
 SCORE_BOARD_HEIGHT = 50
+TIMES_TO_WIN = 5 #number of wins for a player to be a match winner
 
 NET_WIDTH = 2
 
@@ -41,48 +42,58 @@ DOWN = 1
 
 #-- Classes --
 class Net(pygame.sprite.Sprite):
-    def __init__(self, color, width):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([width, SCREEN_HEIGHT-2*WALL_WIDTH])
-        self.image.fill(color)
-        self.rect = self.image.get_rect()
+    def __init__(self, color, width): #Python Constructor
+        pygame.sprite.Sprite.__init__(self) #initializing Sprite
+        self.image = pygame.Surface([width, SCREEN_HEIGHT-2*WALL_WIDTH]) #screating surface image
+        self.image.fill(color) #fill the surface with color
+        self.rect = self.image.get_rect() #get the rect of the surface image
         self.rect.x = SCREEN_WIDTH/2
         self.rect.y = WALL_WIDTH
         
 class Ball(pygame.sprite.Sprite):
     def __init__(self, color, diameter):
     	pygame.sprite.Sprite.__init__(self)
-    	self.image = pygame.Surface([diameter, diameter])
+    	self.image = pygame.Surface([diameter, diameter]) 
     	self.image.fill(FEIND)
     	pygame.draw.circle(self.image, color, (diameter/2, diameter/2), diameter/2)
     	self.rect = self.image.get_rect()
+        #assigns random x and y coordinates
     	self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_WIDTH/3)
     	self.rect.y = random.randint(SCREEN_HEIGHT/3, 2*SCREEN_HEIGHT/3) 	
-    	self.dx = speed_x #Speed in x direction
-    	self.dy = speed_y #Speed in y direction
+        #assigns ball's speed in x and y directions
+    	self.dx = speed_x 
+    	self.dy = speed_y 
   	
+    #dictates ball movement
     def move(self): 
         self.rect.centerx += self.dx
         self.rect.centery += self.dy
-        
+
+    #Responsible for checking collision and adding score to players    
     def checkCollision(self, walls, paddles):
+        #gets the instances the ball hits the top and bottom walls
         walls_hit = pygame.sprite.spritecollide(self, walls, False)
         for wall in walls_hit:
+            #makes the walls impassable
             if self.rect.bottom <= SCREEN_HEIGHT + WALL_WIDTH and self.rect.bottom >= SCREEN_HEIGHT - WALL_WIDTH:
                 self.dy *= -1
             if self.rect.top <= WALL_WIDTH and self.rect.top >= -1 * WALL_WIDTH:
                 self.dy *= -1   
+        #gets the instances the ball hits the right and left paddles
         paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
         for paddle in paddles_hit:
+            #makes the  paddles impassable
             if self.rect.right <= SCREEN_WIDTH and self.rect.right >= SCREEN_WIDTH - 2 * PADDLE_WIDTH:
                 self.dx *= -1
             if self.rect.left <= 2 * PADDLE_WIDTH and self.rect.left >= -1 * PADDLE_WIDTH:
-                self.dx *= -1    
+                self.dx *= -1  
+        #calls addscore when the ball passes the left and right sides
         if self.rect.right >= SCREEN_WIDTH or self.rect.left <= 0:
             if self.rect.right >= SCREEN_WIDTH:
                 playerOne.addScore(playerOneName)
             if self.rect.left <= 0:
-                playerTwo.addScore(playerTwoName)
+                playerTwo.addScore(playerTwoName) 
+            #initialize the new ball starting point once the ball goes out of the screen
             self.rect.x = random.randint(SCREEN_WIDTH/3, 2*SCREEN_WIDTH/3)
             self.rect.y = random.randint(SCREEN_HEIGHT/3, 2*SCREEN_HEIGHT/3) 
 
@@ -94,11 +105,12 @@ class Paddle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-    
+    #dictates the movement of the ball
     def move(self, y_dir, walls):
         self.rect.y += y_dir*PADDLE_DISPLACEMENT    
         block_hit_list = pygame.sprite.spritecollide(self, walls, False)
         for block in block_hit_list:
+            #makes the top and bottom walls impassable by the paddles
             if y_dir == DOWN:
                 self.rect.bottom = block.rect.top
             else:
@@ -122,20 +134,15 @@ class Score(pygame.sprite.Sprite):
         self.rect.centerx = x_pos
         self.rect.centery = SCREEN_HEIGHT/16
         self.score = 0
-        self.font = pygame.font.Font("chargen.ttf", 25)
+        self.font = pygame.font.Font("chargen.ttf", 25) 
         self.image = self.font.render(("%s: %r" %(playerName, self.score)), False, SCORE_BOARD_COLOR)
         
-        # self.win = pygame.Surface([100, 100]) 
-        # self.image.fill(RED)
-        # self.rect = self.win.get_rect()
-        # self.rect.centerx = 200
-        # self.rect.centery = 350 
-        # self.image = self.font.render("HI", False, SCORE_BOARD_COLOR)
-
+    #adds and then shows scores
     def addScore(self, playerName):
         self.score += 1
         self.image = self.font.render(("%s: %r" %(playerName, self.score)), False, SCORE_BOARD_COLOR)
-        if self.score == 3:
+        #when the player's score reaches three, the ball will stop and show which player won
+        if self.score == TIMES_TO_WIN:
             self.image = self.font.render(("%s wins :)" %(playerName)), False, SCORE_BOARD_COLOR)
             ball.dx = 0
             ball.dy = 0
@@ -145,16 +152,10 @@ pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 pygame.display.set_caption("Pong")
 
-
-font = pygame.font.SysFont("comicsansms", 72)
-text = font.render("Hello, World", True, (0, 128, 0))
-screen.blit(text, (320 - text.get_width() // 2, 240 - text.get_height() // 2))
-
-#-- Sprite Objects List --
-paddles_list = pygame.sprite.Group()
-walls_list = pygame.sprite.Group()
-score_walls_list = pygame.sprite.Group()
-all_sprites_list = pygame.sprite.Group()
+#-- Sprite Objects List: These are the groupings of the objects for collision detection --
+paddles_list = pygame.sprite.Group() #contains the left and right paddle objects
+walls_list = pygame.sprite.Group() #contains the top and bottom walls objects
+all_sprites_list = pygame.sprite.Group() #contains all the objects
 
 #-- Create a Net --
 net = Net(GREEN, NET_WIDTH)
@@ -176,17 +177,12 @@ rightPaddle = Paddle(LIGHTBLUE, PADDLE_WIDTH, PADDLE_HEIGHT, R_PADDLE_XPOS, R_PA
 all_sprites_list.add(leftPaddle, rightPaddle)
 paddles_list.add(leftPaddle, rightPaddle)
 
-#-- Create a Wall -- 
+#-- Create Walls -- 
 topWall = Wall(BLUE, 0, SCREEN_HEIGHT - WALL_WIDTH, SCREEN_WIDTH, WALL_WIDTH)
 bottomWall = Wall(BLUE, 0, 0, SCREEN_WIDTH, WALL_WIDTH)
 walls_list.add(topWall, bottomWall)
 all_sprites_list.add(topWall, bottomWall)
 
-#-- Create Red Walls --
-# leftWall = Wall(RED, L_PADDLE_XPOS, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-2*WALL_WIDTH)
-# rightWall = Wall(RED, R_PADDLE_XPOS+PADDLE_WIDTH, WALL_WIDTH, SCORE_WALL_WIDTH, SCREEN_HEIGHT-WALL_WIDTH)
-# all_sprites_list.add(leftWall, rightWall)
-# score_walls_list.add(leftWall, rightWall)
 
 #-- Variable to end the game --
 endGame = False
@@ -225,6 +221,6 @@ while not endGame:
     #-- move the screen --
     pygame.display.flip()
     clock.tick(60)
-        
+
 pygame.quit()
 sys.exit()

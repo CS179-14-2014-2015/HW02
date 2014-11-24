@@ -1,6 +1,9 @@
-Pong Clone (Deadline: 11/25/2014)
-	V1.0: Static table
-	V2.0: Collision Detection
+Pong by Wormhole
+	The clone possesses the basic functions of a pong game. 
+		Defaults:
+			Player One name: Je
+			Player Two name: Ivan
+			Number of times the player has to win: 5
 
 References: 
 	pygame.org documentation
