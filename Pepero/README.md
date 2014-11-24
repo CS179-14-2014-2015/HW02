@@ -11,6 +11,8 @@ Pygame __must__ be installed to play.
 
  Ball Acceleration
 
+ Artificial Intelligence
+
 
 ## Controls
 
