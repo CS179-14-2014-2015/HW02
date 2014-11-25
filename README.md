@@ -1,6 +1,25 @@
-HW02 — Pong (deadline: 2014-11-18)
-===
+Folder contents: 
+	*Pong.pde (Pong in processing)
+	*Pong.py (Pong in python)
+	*data (Folder for audio clips)
+		-click.wav
+		-da-ding.wav
+		-ping.wav
+	*chargen.ttf (Font style used in Pong in python)
 
+Game description: The clones possess the basic functions of the game Pong. 
 
-Make a pong clone. You can use any technology you want as long as it's not Flash/Director or a "game maker".
+Pong.py by Wormhole Python Version	
+	Defaults:
+		Player One name: Je
+		Player Two name: Ivan
+		Number of times the player has to win: 5
 
+Pong.pde by Wormhole Processing Version
+	The other player is an AI. 
+
+References for Pong in python:
+	pygame.org documentation
+	Making Games with Python and Pygame by Al Sweigart
+	http://programarcadegames.com/index.php?chapter=introduction_to_sprites
+	
