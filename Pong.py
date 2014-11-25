@@ -1,6 +1,17 @@
 import pygame, sys, random
 from pygame.locals import * #for pygame variables
+import sys, os, traceback
 
+#sounds
+pygame.mixer.init(buffer=0)
+sounds = {
+    "ping" : pygame.mixer.Sound("data/ping.wav"),
+    "click" : pygame.mixer.Sound("data/click.wav"),
+    "da-ding" : pygame.mixer.Sound("data/da-ding.wav")
+}
+sounds["ping"].set_volume(0.05)
+sounds["click"].set_volume(0.5)
+sounds["da-ding"].set_volume(0.5)
 #-- Global Constants --
 FEIND = (89,79,79)
 LIGHTBLUE = (69,173,168)
@@ -77,8 +88,10 @@ class Ball(pygame.sprite.Sprite):
             #makes the walls impassable
             if self.rect.bottom <= SCREEN_HEIGHT + WALL_WIDTH and self.rect.bottom >= SCREEN_HEIGHT - WALL_WIDTH:
                 self.dy *= -1
+                sounds["ping"].play()
             if self.rect.top <= WALL_WIDTH and self.rect.top >= -1 * WALL_WIDTH:
-                self.dy *= -1   
+                self.dy *= -1
+                sounds["ping"].play()   
         #gets the instances the ball hits the right and left paddles
         paddles_hit = pygame.sprite.spritecollide(self, paddles, False)                
         for paddle in paddles_hit:
@@ -139,6 +152,7 @@ class Score(pygame.sprite.Sprite):
         
     #adds and then shows scores
     def addScore(self, playerName):
+        sounds["click"].play()
         self.score += 1
         self.image = self.font.render(("%s: %r" %(playerName, self.score)), False, SCORE_BOARD_COLOR)
         #when the player's score reaches three, the ball will stop and show which player won
@@ -148,6 +162,7 @@ class Score(pygame.sprite.Sprite):
             ball.dy = 0
         
 #-- Pygame Initializing --
+sounds["da-ding"].play()
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 pygame.display.set_caption("Pong")
