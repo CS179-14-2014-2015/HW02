@@ -5,16 +5,18 @@ import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.util.Random;
 
 public class Pong{
 	StringBuilder keyString;
 	int width, height;
 	boolean debug;
 	
-	WinCondition win;
+	GameState win;
 	RootPane root;
 	PlayCanvas canvas;
 	GameObject p1, p2, ball;
+	Random rnd;
 	
 	boolean[] keys;
 	
@@ -24,18 +26,17 @@ public class Pong{
 		keyString = new StringBuilder("");;
 		width = 640;
 		height = 280;
-		win = new WinCondition();
+		win = new GameState();
 		
 		p1 = new GameObject(15, 50, 5);
 		p2 = new GameObject(15, 50, 5);
 		ball = new GameObject(10, 10, 0);
-		ball.vx = 3.0;
-		ball.vy = -3.0;
-		keys = new boolean[4];
-		
+		keys = new boolean[5];
+		rnd = new Random();
+
         p1.x = 20; 			p1.y = height/2;
 		p2.x = 600; 		p2.y = height/2;
-        ball.x = width/2; 	ball.y = 100;
+        ball.x = p1.x + p1.h; 		ball.y = p1.y + p1.h/2 - ball.h/2;
 		
 		root = new RootPane(width, height, keys, p1, p2, ball, win);
 	}
@@ -76,11 +77,18 @@ public class Pong{
 		}else{
 			p2.vy = 0;
 		}
+		if(keys[4] && win.b == 0){
+			win.b = 1;
+			ball.vy = -5.01 + 10*rnd.nextDouble();
+			ball.vx = 3 + 7*rnd.nextDouble();
+		}
 	}
 	
 	void doPhysics(){
-
-		if(ball.x - ball.w < 0){ // win condition for p2
+		if(win.b == 0){
+			ball.x = p1.x + 15;
+			ball.y = p1.y + p1.h/2 - ball.h/2;
+		}else if(ball.x - ball.w < 0){ // win condition for p2
             //System.out.println("Player 2 wins!");
             win.a = 2;
         }
@@ -181,7 +189,7 @@ class GameObject{
 class RootPane extends JFrame{
 	PlayCanvas canvas;
 	boolean[] keys;
-	public RootPane(int w, int h, boolean[] keys, GameObject a, GameObject b, GameObject c, WinCondition win){
+	public RootPane(int w, int h, boolean[] keys, GameObject a, GameObject b, GameObject c, GameState win){
 		setTitle("HW02");
 		setSize(w,h);
 		setResizable(false);
@@ -222,6 +230,9 @@ class RootPane extends JFrame{
 			if(x == 'k'){
 				keys[3] = true;
 			}
+			if(x == ' '){
+				keys[4] = true;
+			}
 		}
 		@Override
 		public void keyReleased(KeyEvent e) {
@@ -238,6 +249,9 @@ class RootPane extends JFrame{
 			if(x == 'k'){
 				keys[3] = false;
 			}
+			if(x == ' '){
+				keys[4] = false;
+			}
 		}
 	}
 }
@@ -245,9 +259,9 @@ class RootPane extends JFrame{
 class PlayCanvas extends Canvas{
 	int width, height;
 	GameObject p1, p2, ball;
-	WinCondition win;
+	GameState win;
 
-	public PlayCanvas(int w, int h, GameObject a, GameObject b, GameObject c, WinCondition win){
+	public PlayCanvas(int w, int h, GameObject a, GameObject b, GameObject c, GameState win){
 		width = w;
 		height = h;
 		p1 = a;
@@ -284,9 +298,11 @@ class PlayCanvas extends Canvas{
 	}
 }
 
-class WinCondition{
+class GameState{
 	int a;
-	public WinCondition(){
+	int b;
+	public GameState(){
 		a = 0;
+		b = 0;
 	}
 }
