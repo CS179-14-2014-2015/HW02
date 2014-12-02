@@ -1,6 +1,8 @@
-HW02 — Pong (deadline: 2014-11-18)
-===
+Pong
+====
 
+A simple pong made in C++ with SFML. 
+---
+NB : The executable must be place in the same folder (i.e project folder) as the ressources (sound and font).
 
-Make a pong clone. You can use any technology you want as long as it's not Flash/Director or a "game maker".
-
+More information about SFML [here.](http://sfml-dev.org)
